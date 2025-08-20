@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # The Database Service (Postgres)
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=notes_db
+      - POSTGRES_USER=notes_user
+      - POSTGRES_PASSWORD=notes_password
+
+  # The Web Service (Django)
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=notes_db
+      - DB_USER=notes_user
+      - DB_PASS=notes_password
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
